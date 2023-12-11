@@ -30,6 +30,7 @@ def split_video_to_images(video_path, output_folder, start_on = 0, interval_seco
 
 # WORKER = int(input('Enter Total Worker: '))
 files = glob.glob('videos/*.mkv') + glob.glob('videos/*.mp4')
+databases = glob.glob('database/*')
 outputs = glob.glob('outputs/*')
 for file in files:
     path = Path(file)
@@ -43,18 +44,19 @@ for file in files:
     else:
         split_video_to_images(file, output_folder)
     
-    print(f'Embedding {file} started!')
-    
-    embeddings = []
-    images = glob.glob(output_folder + '/*.png')
-    for image in images:
-        timestamp = Path(image).as_posix().split('/')[-1].removesuffix('.png')
-        timestamp = int(timestamp)
-        image_obj = Image.open(image)
-        vector = predict(image_obj)
+    if not 'database/' + file_checksum + '.nafis' in databases:
+        print(f'Embedding {file} started!')
+        
+        embeddings = []
+        images = glob.glob(output_folder + '/*.png')
+        for image in images:
+            timestamp = Path(image).as_posix().split('/')[-1].removesuffix('.png')
+            timestamp = int(timestamp)
+            image_obj = Image.open(image)
+            vector = predict(image_obj)
 
-        embeddings.append(Embedding(title = title, timestamp = timestamp, vector = vector))
-    
-    result = Result(title = title, embeddings = embeddings)
-    with open('database/' + file_checksum + '.nafis', 'rb') as f:
-        f.write(pickle.dumps(result))
+            embeddings.append(Embedding(title = title, timestamp = timestamp, vector = vector))
+        
+        result = Result(title = title, embeddings = embeddings)
+        with open('database/' + file_checksum + '.nafis', 'wb') as f:
+            f.write(pickle.dumps(result))
