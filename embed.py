@@ -4,7 +4,7 @@ from PIL import Image
 from lib.predict import predict
 from lib.schema import Result, Embedding
 from pathlib import Path
-import os, glob, hashlib, pickle
+import os, glob, hashlib, pickle, zlib
 
 if not os.path.exists('outputs'):
     os.mkdir('outputs')
@@ -59,4 +59,8 @@ for file in files:
         
         result = Result(title = title, embeddings = embeddings)
         with open('database/' + file_checksum + '.nafis', 'wb') as f:
-            f.write(pickle.dumps(result))
+            f.write(
+                zlib.compress(
+                    pickle.dumps(result)
+                )
+            )

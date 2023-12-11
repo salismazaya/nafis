@@ -1,6 +1,6 @@
 from lib.chroma import collection
 from lib.schema import Result
-import sqlite3, glob, pathlib, pickle
+import sqlite3, glob, pathlib, pickle, zlib
   
 conn = sqlite3.connect('database.db')
 cur = conn.cursor()
@@ -13,7 +13,11 @@ for database in databases:
         continue
 
     print('Importing', database)
-    result: Result = pickle.loads(open(database, 'rb').read())
+    result: Result = pickle.loads(
+        zlib.decompress(
+            open(database, 'rb').read()
+        )
+    )
     for embedding in result.embeddings:
         collection.add(
             ids = [f'{embedding.title}|{embedding.timestamp}'],
