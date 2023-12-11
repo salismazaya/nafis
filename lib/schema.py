@@ -11,3 +11,6 @@ class Embedding:
 class Result:
     title: str
     embeddings: List[Embedding]
+
+    def __str__(self):
+        return 'Result'
