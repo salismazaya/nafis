@@ -1,5 +1,5 @@
 from moviepy.video.io.VideoFileClip import VideoFileClip
-# from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor
 from PIL import Image
 from lib.predict import predict
 from lib.schema import Result, Embedding
@@ -28,11 +28,12 @@ def split_video_to_images(video_path, output_folder, start_on = 0, interval_seco
 
     clip.reader.close()
 
-# WORKER = int(input('Enter Total Worker: '))
+WORKER = int(input('Enter Total Worker: '))
 files = glob.glob('videos/*.mkv') + glob.glob('videos/*.mp4')
 databases = glob.glob('database/*')
 outputs = glob.glob('outputs/*')
-for file in files:
+
+def start(file: str):
     path = Path(file)
     title = path.as_posix().split('/')[-1]
     print(f'Split {file} to images started!')
@@ -64,3 +65,6 @@ for file in files:
                     pickle.dumps(result)
                 )
             )
+
+with ThreadPoolExecutor(max_workers = WORKER) as t:
+    t.map(start, files)
