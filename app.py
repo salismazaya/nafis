@@ -20,5 +20,5 @@ demo = gr.Interface(fn = prediction, inputs = "image", outputs = "text")
 if __name__ == "__main__":
     demo.launch(
         server_name = os.environ.get('HOST'),
-        server_port = int(os.environ.get('PORT'))
+        server_port = int(os.environ.get('PORT', 8000))
     )   
