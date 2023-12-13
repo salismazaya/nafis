@@ -3,7 +3,7 @@ from PIL import Image
 from lib.predict import predict
 from lib.schema import Result, Embedding
 from pathlib import Path
-import os, glob, hashlib, pickle, zlib, sys, cv2, numpy as np
+import os, glob, hashlib, pickle, zlib, sys, cv2
 
 if not os.path.exists('outputs'):
     os.mkdir('outputs')
@@ -15,12 +15,16 @@ def split_video_to_images(video_path, output_folder):
     vidcap = cv2.VideoCapture(video_path)
     count = 0
     success = True
+    interval = 1
+
     while success:
-      print(count, output_folder)
-      vidcap.set(cv2.CAP_PROP_POS_MSEC, 1)      
-      success, image = vidcap.read()
-      cv2.imwrite(output_folder + "/%d.png" % count, image)
-      count += 1
+        frame_time = int(vidcap.get(cv2.CAP_PROP_POS_MSEC))
+        success, image = vidcap.read()
+
+        if success and frame_time // 1000 >= count * interval:
+            print(f'Processing [{count}]')
+            cv2.imwrite(output_folder + "/%d.png" % count, image)
+            count += 1
 
 try:
     WORKER = int(sys.argv[-1])
