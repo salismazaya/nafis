@@ -5,7 +5,7 @@ from interface.web import start_web
 def main():
     try:
         interface = sys.argv[1]
-        if interface in ["cli", "web"]:
+        if interface not in ["cli", "web"]:
             print ("Interface not found. Auto select interface web")
             interface = "web"
     except IndexError:

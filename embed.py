@@ -60,7 +60,7 @@ def start(file: str):
             timestamp = int(timestamp)
             image_obj = Image.open(image)
             vector = predict(image_obj)
-
+            
             embeddings.append(Embedding(title = title, timestamp = timestamp, vector = vector))
         
         result = Result(title = title, embeddings = embeddings)
