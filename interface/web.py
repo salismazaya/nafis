@@ -20,7 +20,7 @@ logger.setLevel(logging.INFO)
 
 for log_name, log_object in logging.Logger.manager.loggerDict.items():
     if log_name != "rich":
-        log_object.disabled = True
+        logging.getLogger(log_name).setLevel(logging.WARNING)
 
 def prediction(image_array):
     result = predict_image(Image.fromarray(image_array))
