@@ -20,7 +20,7 @@ def split_video_to_images(video_path, output_folder):
       vidcap.set(cv2.CAP_PROP_POS_MSEC,(count*1000))      
       success, image = vidcap.read()
 
-      image_last = cv2.imread("{}.png".format(count-1))
+      image_last = cv2.imread("{}/{}.png".format(output_folder, count - 1))
       if np.array_equal(image,image_last):
           break
 
