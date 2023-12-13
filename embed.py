@@ -4,7 +4,7 @@ from PIL import Image
 from lib.predict import predict
 from lib.schema import Result, Embedding
 from pathlib import Path
-import os, glob, hashlib, pickle, zlib
+import os, glob, hashlib, pickle, zlib, sys
 
 if not os.path.exists('outputs'):
     os.mkdir('outputs')
@@ -28,7 +28,11 @@ def split_video_to_images(video_path, output_folder, start_on = 0, interval_seco
 
     clip.reader.close()
 
-WORKER = int(input('Enter Total Worker: '))
+try:
+    WORKER = int(sys.argv[-1])
+except:
+    WORKER = int(input('Enter Total Worker: '))
+
 files = glob.glob('videos/*.mkv') + glob.glob('videos/*.mp4')
 databases = glob.glob('database/*')
 outputs = glob.glob('outputs/*')
