@@ -1,3 +1,6 @@
+import logging
+import os
+from rich.logging import RichHandler
 from moviepy.video.io.VideoFileClip import VideoFileClip
 from concurrent.futures import ThreadPoolExecutor
 from PIL import Image
@@ -6,7 +9,17 @@ from lib.schema import Result, Embedding
 from pathlib import Path
 import os, glob, hashlib, pickle, zlib, sys
 
+logging.basicConfig(
+    level="NOSET",
+    format="%(message)",
+    datefmt="[%X]",
+    handlers=[RichHandler()]
+)
+logger = logging.getLogger("rich")
+
 if not os.path.exists('outputs'):
+    logger.warning("Output directory not found")
+    logger.info("Create new outputs directory")
     os.mkdir('outputs')
 
 def split_video_to_images(video_path, output_folder, start_on = 0, interval_seconds = 1):
@@ -16,6 +29,7 @@ def split_video_to_images(video_path, output_folder, start_on = 0, interval_seco
     clip = VideoFileClip(video_path)
 
     duration = clip.duration
+    logger.info(f"Movie duration: {duration}")
 
     timestamps = range(start_on, int(duration), interval_seconds)
     def execute(i):
@@ -33,6 +47,10 @@ try:
 except:
     WORKER = int(input('Enter Total Worker: '))
 
+logger.info(f"Your cpu count: {os.cpu_count()}")
+if WORKER > os.cpu_count():
+    logger.warning("Not recommended: if the number of workers is greater than the number of CPUs")
+    
 files = glob.glob('videos/*.mkv') + glob.glob('videos/*.mp4')
 databases = glob.glob('database/*')
 outputs = glob.glob('outputs/*')
