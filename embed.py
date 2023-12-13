@@ -11,12 +11,12 @@ if not os.path.exists('outputs'):
 def split_video_to_images(video_path, output_folder):
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
-
-    cv2.cuda.setDevice(0)
+    
     vidcap = cv2.VideoCapture(video_path)
     count = 0
     success = True
     while success:
+      print(count, output_folder)
       vidcap.set(cv2.CAP_PROP_POS_MSEC,(count*1000))      
       success, image = vidcap.read()
 
