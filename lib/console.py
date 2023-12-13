@@ -21,4 +21,4 @@ class Console(RichConsole):
         self.print(message, style="magenta", markup=True)
 
     def danger(self, message):
-        self.print(message, style="bold green", markup=True)
+        self.print(message, style="bold red", markup=True)

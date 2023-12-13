@@ -1,19 +1,18 @@
 import os
 import sys
 from lib.console import Console
-from lib.chroma import collection
-from lib.predict import predict, predict_image
+from lib.predict import predict_image
 from PIL import Image
 console = Console()
 
-def start_cli():
-    try:
-        filename = sys.argv[2]
-    except IndexError:
-        filename = console.input("Enter your file: ")
+def start_cli(options, args):
+    filename = options.filename
+    if filename is None:
+        console.danger("No filename selected")
+        sys.exit()
     if os.path.isfile(filename) is not True:
-        console.error(f"The {filename} file could not be found")
-        
+        console.danger(f"The {filename} file could not be found")
+            
     image = Image.open(filename)
     result = predict_image(image=image)
     if result is None:

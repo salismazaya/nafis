@@ -1,4 +1,3 @@
-import logging
 from lib.console import Console
 import gradio as gr
 from lib.chroma import collection
@@ -21,7 +20,7 @@ def prediction(image_array):
         console.info(f"Score: {result.score}")
         return f"{result.name} {result.hours}:{result.minutes}:{result.seconds} Score: {result.score}"
     
-def start_web():
+def start_web(options):
     demo = gr.Interface(fn = prediction, inputs = "image", outputs = "text")
     demo.launch(
         server_name = os.environ.get('HOST'),
