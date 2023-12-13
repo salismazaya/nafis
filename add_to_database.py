@@ -35,5 +35,6 @@ for database in databases:
             embeddings = [embedding.vector],
         )
     
+    logger.info("Saving imported database")
     cur.execute(f"INSERT INTO imported VALUES('{hash_}')")
     conn.commit()
