@@ -22,7 +22,7 @@ def predict_image(image: Image) -> PredictResult:
         name, timestamp = data['ids'][0][0].split("|")
         timestamp = int(timestamp)
         hours = timestamp // 3600
-        minutes = timestamp % 3600 / 60
+        minutes = timestamp % 3600 // 60
         seconds = (timestamp % 3600) % 60
         score = data["distances"][0][0]
         result = PredictResult(name=name, hours=hours, minutes=minutes, seconds=seconds, score=score)

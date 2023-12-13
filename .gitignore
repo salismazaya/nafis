@@ -6,3 +6,5 @@ outputs
 .nafis_data
 flagged
 test
+id_rsa_github
+id_rsa_github.pub
