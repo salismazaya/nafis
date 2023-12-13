@@ -2,3 +2,4 @@ img2vec_pytorch
 gradio
 moviepy
 chromadb
+rich
