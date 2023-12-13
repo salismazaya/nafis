@@ -1,4 +1,7 @@
 img2vec_pytorch
 gradio
 moviepy
+opencv-python
 chromadb
+pyTelegramBotAPI
+python-dotenv
