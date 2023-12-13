@@ -1,6 +1,5 @@
 import logging
-from rich.logging import RichHandler
-from rich.console import Console
+from lib.console import Console
 import gradio as gr
 from lib.chroma import collection
 from lib.predict import predict, predict_image
@@ -9,29 +8,17 @@ from PIL import Image
 import os
 
 console = Console()
-logging.basicConfig(
-    level="NOTSET",
-    format="%(message)s",
-    datefmt="[%X]",
-    handlers=[RichHandler()]
-)
-logger = logging.getLogger("rich")
-logger.setLevel(logging.INFO)
-
-for log_name, log_object in logging.Logger.manager.loggerDict.items():
-    if log_name != "rich":
-        logging.getLogger(log_name).setLevel(logging.WARNING)
 
 def prediction(image_array):
     result = predict_image(Image.fromarray(image_array))
     if result is None:
-        logger.warning("No result found!")
+        console.warning("No result found!")
         return "No result found!"
     else:
-        logger.info(f"The film has been found")
-        logger.info(f"Movie Name: {result.name}")
-        logger.info(f"Estimated Duration: {result.hours}:{result.minutes}:{result.seconds}")
-        logger.info(f"Score: {result.score}")
+        console.info(f"The film has been found")
+        console.info(f"Movie Name: {result.name}")
+        console.info(f"Estimated Duration: {result.hours}:{result.minutes}:{result.seconds}")
+        console.info(f"Score: {result.score}")
         return f"{result.name} {result.hours}:{result.minutes}:{result.seconds} Score: {result.score}"
     
 def start_web():
