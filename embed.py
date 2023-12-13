@@ -19,6 +19,7 @@ def split_video_to_images(video_path, output_folder, start_on = 0, interval_seco
 
     timestamps = range(start_on, int(duration), interval_seconds)
     def execute(i):
+        print(f'Proccessing [{i}]')
         frame = Image.fromarray(clip.get_frame(i))
         image_path = os.path.join(output_folder, f"{i}.png")
         frame.save(image_path)
