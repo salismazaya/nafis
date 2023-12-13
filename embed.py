@@ -17,13 +17,8 @@ def split_video_to_images(video_path, output_folder):
     success = True
     while success:
       print(count, output_folder)
-      vidcap.set(cv2.CAP_PROP_POS_MSEC,(count*1000))      
+      vidcap.set(cv2.CAP_PROP_POS_MSEC, 1)      
       success, image = vidcap.read()
-
-      image_last = cv2.imread("{}/{}.png".format(output_folder, count - 1))
-      if np.array_equal(image,image_last):
-          break
-
       cv2.imwrite(output_folder + "/%d.png" % count, image)
       count += 1
 

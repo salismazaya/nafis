@@ -1,7 +1,7 @@
 img2vec_pytorch
 gradio
 moviepy
-opencv-python
+https://github.com/cudawarped/opencv-python-cuda-wheels/releases/download/4.8.0.20231027/opencv_contrib_python_rolling-4.8.0.20231027-cp36-abi3-linux_x86_64.whl
 chromadb
 pyTelegramBotAPI
 python-dotenv
