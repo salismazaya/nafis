@@ -1,24 +1,21 @@
-import gradio as gr
-from lib.chroma import collection
-from lib.predict import predict
-from PIL import Image
-import os
+import sys
+from interface.cli import start_cli
+from interface.web import start_web
 
-def prediction(image_array):
-    embedding = predict(Image.fromarray(image_array))
-    data = collection.query(query_embeddings = [embedding], n_results = 1)
-    name, timestamp =  data['ids'][0][0].split('|')
-    timestamp = int(timestamp)
-    hours = timestamp // 3600
-    minutes = timestamp % 3600 // 60
-    seconds = (timestamp % 3600) % 60
+def main():
+    try:
+        interface = sys.argv[1]
+        if interface in ["cli", "web"]:
+            print ("Interface not found. Auto select interface web")
+            interface = "web"
+    except IndexError:
+        print ("No interface selected. Auto select interface web")
+        interface = "web"
+    
+    if interface == "web":
+        start_web()
+    elif interface == "cli":
+        start_cli()
 
-    return f"{name} {hours}:{minutes}:{seconds} Score: {data['distances'][0][0]}"
-
-demo = gr.Interface(fn = prediction, inputs = "image", outputs = "text")
-
-if __name__ == "__main__":
-    demo.launch(
-        server_name = os.environ.get('HOST'),
-        server_port = int(os.environ.get('PORT', 8000))
-    )   
+if __name__ == "__main__":    
+    main()
