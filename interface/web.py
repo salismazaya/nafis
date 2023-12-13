@@ -1,7 +1,7 @@
 import gradio as gr
 from lib.chroma import collection
 from lib.predict import predict, predict_image
-from lib.types.predict import PredictResult
+from lib.schema import PredictResult
 from PIL import Image
 import os
 

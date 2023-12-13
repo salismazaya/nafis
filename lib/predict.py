@@ -1,7 +1,7 @@
 from lib.chroma import collection
 from img2vec_pytorch import Img2Vec
 from PIL import Image
-from lib.types.predict import PredictResult
+from lib.schema import PredictResult
 
 img2vec = Img2Vec()
 
