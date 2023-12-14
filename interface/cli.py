@@ -6,12 +6,10 @@ from PIL import Image
 console = Console()
 
 class CLI:
-    def __init__(self, options) -> None:
+    def __init__(self, options = None) -> None:
         self.console = Console()
         self.prediction = Prediction()
         self.options = options
-
-        self.filename = options.filename
 
     def set_options(self, options):
         self.options = options
@@ -25,6 +23,7 @@ class CLI:
             sys.exit()
         
     def start(self):
+        self.filename = self.options.filename
         self.check_filename()
 
         image = Image.open(self.filename)
