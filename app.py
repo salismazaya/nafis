@@ -1,11 +1,12 @@
 import sys
 import optparse
-from interface.cli import start_cli
+from interface.cli import CLI
 from interface.web import start_web
 
 class App:
     def __init__(self) -> None:
         self.parser = optparse.OptionParser()
+        self.cli = CLI()
 
     def configure(self):
         self.parser.add_option("-i", "--interface", dest="interface", help="Application interface, default: web")
@@ -19,7 +20,8 @@ class App:
         if options.interface == "web":
             start_web(options)
         elif options.interface == "cli":
-            start_cli(options, args)
+            self.cli.set_options(options=options)
+            self.cli.start()
         else:
             self.parser.print_help()
      
