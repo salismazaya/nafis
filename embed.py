@@ -1,18 +1,19 @@
+import os, glob, hashlib, pickle, zlib, sys
 from moviepy.video.io.VideoFileClip import VideoFileClip
 from concurrent.futures import ThreadPoolExecutor
 from PIL import Image
-from lib.predict import predict
+from lib.predict import Prediction
 from lib.schema import Result, Embedding
 from pathlib import Path
-import os, glob, hashlib, pickle, zlib, sys
 from lib.console import Console
+from optparse import OptionParser
 
 class ImageSpliter:
     def __init__(self, output_folder: str, video_path: str, console: Console) -> None:
         self.output_folder = output_folder
         self.video_path = video_path
         self.console = (console if console is None else Console())
-
+        
         self.clip = VideoFileClip(self.video_path)
 
     @property
@@ -36,19 +37,21 @@ class ImageSpliter:
 
     def run(self, start_on: int = 0, interval_seconds: int = 1):
         self.check_output()
-        self.console.info(f'Movie duration: {(round(self.duration))}')
+        self.console.info(f'\nMovie duration: {(round(self.duration))} seconds')
         for index in self.timestamps(start_on, interval_seconds):
             self.execute(index=index)
         self.clip.reader.close()
 
 class Embed:
-    def __init__(self) -> None:
+    def __init__(self, cuda: bool = False, model: str = "resnet18", max_worker: int = None) -> None:
         self.console = Console()
+        self.prediction = Prediction(cuda=cuda, model=model)
         self.supported_extension = ["mkv", "mp4"]
 
         self.files = self.get_files()
         self.databases = self.get_databases()
         self.outputs = self.get_outputs()
+        self.worker = (max_worker if max_worker is not None else os.cpu_count())
 
         self.check_output()
 
@@ -80,7 +83,7 @@ class Embed:
         for image in images:
             timestamp = Path(image).as_posix().split('/')[-1].removesuffix('.png')
             image_object = Image.open(image)
-            vector = predict(image_object)
+            vector = self.prediction.toVector(image_object)
             embeddings.append(
                 Embedding(
                     title=title,
@@ -120,17 +123,20 @@ class Embed:
             self.embed(output_folder=output, title=title, checksum=checksum)
 
     def main(self):
-        worker = self.console.input("Total worker: ")
-        if worker.rstrip().lstrip() == "":
-            worker = os.cpu_count()
-        if worker.isdigit() is not True:
-            self.console.danger("Input only accept digit")
-            sys.exit()
-        
         with self.console.status("[bold green] Starting embedding system") as status:
-            with ThreadPoolExecutor(max_workers=int(worker)) as thread:
+            with ThreadPoolExecutor(max_workers=int(self.worker)) as thread:
                 thread.map(self.start, (self.files))
 
 if __name__ == "__main__":
-    app = Embed()
+    option = OptionParser()
+    option.add_option("--cuda", dest="cuda", help="Use your GPU", action="store_true")
+    option.add_option("-w", "--worker", dest="worker", help="Total worker")
+    option.add_option("-m", "--model", dest="model", help="Model, default: resnet18")
+    opt, args = option.parse_args()
+    
+    app = Embed(
+        cuda=(True if opt.cuda == True else False),
+        model=(opt.model if opt.model is not None else "resnet18"),
+        max_worker=(opt.worker if opt.worker is not None else os.cpu_count())
+    )
     app.main()
