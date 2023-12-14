@@ -13,6 +13,9 @@ class CLI:
 
         self.filename = options.filename
 
+    def set_options(self, options):
+        self.options = options
+    
     def check_filename(self):
         if self.filename is None:
             self.console.danger("No filename selected")
