@@ -1,11 +1,12 @@
 import os, glob, hashlib, pickle, zlib, sys
-from moviepy.video.io.VideoFileClip import VideoFileClip
+import datetime
 from concurrent.futures import ThreadPoolExecutor
 from PIL import Image
 from lib.predict import Prediction
 from lib.schema import Result, Embedding
 from pathlib import Path
 from lib.console import Console
+from lib.video import Video
 from optparse import OptionParser
 
 class ImageSpliter:
@@ -13,34 +14,24 @@ class ImageSpliter:
         self.output_folder = output_folder
         self.video_path = video_path
         self.console = (console if console is None else Console())
+        self.video = Video(self.video_path, self.output_folder)
+
+        self.fps = self.video.fps
         
-        self.clip = VideoFileClip(self.video_path)
+    def execute(self, second: int):
+        frame_id = self.video.calculate_frame(self.fps, second)
+        state, frame = self.video.get_frame(frame_id)
+        if state:
+            image_path = os.path.join(self.output_folder, f"{frame_id}.png")
+            self.video.save(image_path, frame)
 
-    @property
-    def duration(self):
-        return self.clip.duration
-    
-    def timestamps(self, start_on: int = 0, interval_seconds: int = 1):
-        timestamps = range(start_on, int(self.duration), interval_seconds)
-        return timestamps
-        
-    def check_output(self):
-        if not os.path.exists(self.output_folder):
-            os.makedirs(self.output_folder)
-
-    def execute(self, index: int):
-        frame = Image.fromarray(
-            self.clip.get_frame(index)
-        )
-        image_path = os.path.join(self.output_folder, f"{index}.png")
-        frame.save(image_path)
-
-    def run(self, start_on: int = 0, interval_seconds: int = 1):
-        self.check_output()
-        self.console.info(f'\nMovie duration: {(round(self.duration))} seconds')
-        for index in self.timestamps(start_on, interval_seconds):
-            self.execute(index=index)
-        self.clip.reader.close()
+    def run(self):
+        with self.console.status(f"Writing frame duration 0") as status:
+            for second in self.video.calculate_timestamp():
+                duration = datetime.timedelta(seconds=second)
+                status.update(f"Writing frame duration {duration}")
+                self.execute(second=second)
+        self.video.close()
 
 class Embed:
     def __init__(self, cuda: bool = False, model: str = "resnet18", max_worker: int = None) -> None:
@@ -112,20 +103,21 @@ class Embed:
         
         image_spliter = ImageSpliter(output_folder=output, video_path=filename, console=self.console)
         if os.path.isdir(output):
-            self.console.info("Continuing frame splitting")
-            start_on = len(glob.glob(f"{output}/*.png"))
-            image_spliter.run(start_on=start_on, interval_seconds=1)
-        else:
-            image_spliter.run()
+            self.console.info("Remove old output folder")
+            try:
+                os.removedirs(output)
+            except OSError:
+                self.console.warning("Failed remove old output folder")
+        image_spliter.run()
         
         if os.path.isfile(os.path.join("database", checksum + '.nafis')):
             self.console.info(f"Embedding {filename} started!")
             self.embed(output_folder=output, title=title, checksum=checksum)
 
     def main(self):
-        with self.console.status("[bold green] Starting embedding system") as status:
-            with ThreadPoolExecutor(max_workers=int(self.worker)) as thread:
-                thread.map(self.start, (self.files))
+        for filename in self.files:
+            self.console.info(f"Start embedding file {filename}")
+            self.start(filename=filename)
 
 if __name__ == "__main__":
     option = OptionParser()
