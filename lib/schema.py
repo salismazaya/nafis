@@ -1,10 +1,11 @@
 from dataclasses import dataclass
 from typing import Tuple
+from datetime import timedelta
 
 @dataclass
 class Embedding:
     title: str
-    timestamp: int
+    timestamp: timedelta
     vector: Tuple[float]
 
 @dataclass
