@@ -1,4 +1,5 @@
 import os, glob, hashlib, pickle, zlib, sys
+import cv2
 import datetime
 from concurrent.futures import ThreadPoolExecutor
 from PIL import Image
@@ -22,7 +23,7 @@ class ImageSpliter:
         frame_id = self.video.calculate_frame(self.fps, second)
         state, frame = self.video.get_frame(frame_id)
         if state:
-            image_path = os.path.join(self.output_folder, f"{frame_id}.png")
+            image_path = os.path.join(self.output_folder, f"{second}.png")
             self.video.save(image_path, frame)
 
     def run(self):
@@ -71,17 +72,20 @@ class Embed:
     def embed(self, output_folder: str, title: str = "", checksum: str = ""):
         embeddings = []
         images = glob.glob(output_folder + "/*.png")
-        for image in images:
-            timestamp = Path(image).as_posix().split('/')[-1].removesuffix('.png')
-            image_object = Image.open(image)
-            vector = self.prediction.toVector(image_object)
-            embeddings.append(
-                Embedding(
-                    title=title,
-                    timestamp=int(timestamp),
-                    vector=vector
+        with self.console.status("Embedding frame ") as status:
+            for index, image in enumerate(images):
+                status.update(f"Embedding frame {index}")
+                timestamp = Path(image).as_posix().split('/')[-1].removesuffix('.png')
+                image_array = cv2.imread(image)
+                image_object = Image.fromarray(image_array)
+                vector = self.prediction.toVector(image_object)
+                embeddings.append(
+                    Embedding(
+                        title=title,
+                        timestamp=int(timestamp),
+                        vector=vector
+                    )
                 )
-            )
         
         result = Result(
             title=title,
@@ -100,21 +104,26 @@ class Embed:
         title = path.as_posix().split("/")[-1]
         checksum = hashlib.md5(open(filename, "rb").read()).hexdigest()
         output = os.path.join("outputs", checksum)
-        
         image_spliter = ImageSpliter(output_folder=output, video_path=filename, console=self.console)
         if os.path.isdir(output):
             self.console.info("Remove old output folder")
             try:
-                os.removedirs(output)
+                os.remove(output)
             except OSError:
                 self.console.warning("Failed remove old output folder")
+        else:
+            self.console.info("Make new checksum folder")
+            os.mkdir(output)
         image_spliter.run()
         
         if os.path.isfile(os.path.join("database", checksum + '.nafis')):
-            self.console.info(f"Embedding {filename} started!")
-            self.embed(output_folder=output, title=title, checksum=checksum)
+            self.console.info(f"Overwrite database")
+        self.console.info(f"Embedding {filename} started!")
+        self.embed(output_folder=output, title=title, checksum=checksum)
 
     def main(self):
+        self.check_output()
+        
         for filename in self.files:
             self.console.info(f"Start embedding file {filename}")
             self.start(filename=filename)
