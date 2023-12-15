@@ -1,7 +1,7 @@
 import os
 import gradio as gr
-from lib.console import Console
-from lib.predict import Prediction
+from nafis.console import Console
+from nafis.predict import Prediction
 from PIL import Image
 
 class Web:

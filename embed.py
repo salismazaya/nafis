@@ -1,12 +1,12 @@
 import os, glob, hashlib, pickle, zlib, sys
-from moviepy.video.io.VideoFileClip import VideoFileClip
-from concurrent.futures import ThreadPoolExecutor
 from PIL import Image
-from lib.predict import Prediction
-from lib.schema import Result, Embedding
 from pathlib import Path
-from lib.console import Console
 from optparse import OptionParser
+from nafis.console import Console
+from concurrent.futures import ThreadPoolExecutor
+from moviepy.video.io.VideoFileClip import VideoFileClip
+from nafis.predict import Prediction
+from nafis.schema import Result, Embedding
 
 class ImageSpliter:
     def __init__(self, output_folder: str, video_path: str, console: Console) -> None:

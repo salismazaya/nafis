@@ -1,5 +1,5 @@
-from lib.chroma import collection
-from lib.schema import Result
+from nafis.chroma import collection
+from nafis.schema import Result
 from rich.logging import RichHandler
 import sqlite3, glob, pathlib, pickle, zlib, logging
 
