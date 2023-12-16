@@ -1,5 +1,7 @@
 import os
 import sys
+import cv2
+from torchvision import transforms
 from lib.console import Console
 from lib.predict import Prediction
 from PIL import Image
@@ -33,5 +35,5 @@ class CLI:
         else:
             self.console.info(f"The film has been found")
             self.console.info(f"Movie Name: {result.name}")
-            self.console.info(f"Estimated Duration: {result.hours}:{result.minutes}:{result.seconds}")
+            self.console.info(f"Estimated Duration: {result.time}")
             self.console.info(f"Score: {result.score}")
