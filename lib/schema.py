@@ -1,3 +1,4 @@
+import datetime
 from dataclasses import dataclass
 from typing import Tuple
 from datetime import timedelta
@@ -19,7 +20,5 @@ class Result:
 @dataclass
 class PredictResult:
     name: str
-    hours: int
-    minutes: int
-    seconds: int
+    time: datetime.timedelta
     score: int
