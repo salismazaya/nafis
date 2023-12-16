@@ -31,7 +31,7 @@ for database in databases:
     )
     for embedding in result.embeddings:
         collection.add(
-            ids = [f'{embedding.title}|{embedding.timestamp}'],
+            ids = [f'{embedding.title}|{embedding.timestamp.seconds}'],
             embeddings = [embedding.vector],
         )
     
