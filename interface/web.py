@@ -19,7 +19,7 @@ class Web:
             self.console.info(f"Movie Name: {result.name}")
             self.console.info(f"Estimated Duration: {result.hours}:{result.minutes}:{result.seconds}")
             self.console.info(f"Score: {result.score}")
-            return f"{result.name} {result.hours}:{result.minutes}:{result.seconds} Score: {result.score}"
+            return f"{result.name} {result.time} Score: {result.score}"
 
     def start(self):    
         demo = gr.Interface(
