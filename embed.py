@@ -76,7 +76,7 @@ class Embed:
             for index, image in enumerate(images):
                 status.update(f"Embedding frame {index}")
                 timestamp = Path(image).as_posix().split('/')[-1].removesuffix('.png')
-                frame_timestamp = datetime.timedelta(timestamp)
+                frame_timestamp = datetime.timedelta(seconds=int(timestamp))
                 image_array = cv2.imread(image)
                 image_object = Image.fromarray(image_array)
                 vector = self.prediction.toVector(image_object)
