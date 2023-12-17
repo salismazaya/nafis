@@ -1,6 +1,7 @@
 import warnings
 warnings.filterwarnings("ignore")
 import os
+import datetime
 import gradio as gr
 from lib.console import Console
 from lib.predict import Prediction
@@ -11,15 +12,20 @@ class Web:
         self.console = Console()
         self.prediction = Prediction()
 
+    def convert_to_duration(self, timestamp):
+        if isinstance(timestamp, datetime.timedelta) is not True:
+            return datetime.timedelta(seconds=timestamp)
+        
     def predict(self, image_array):
         result = self.prediction.predict_image(Image.fromarray(image_array))
         if result is None:
             self.console.warning("No result found!")
             return "No result found!"
         else:
+            timestamp = result.time
             self.console.info(f"The film has been found")
             self.console.info(f"Movie Name: {result.name}")
-            self.console.info(f"Estimated Duration: {result.hours}:{result.minutes}:{result.seconds}")
+            self.console.info(f"Estimated Duration: {result.time}")
             self.console.info(f"Score: {result.score}")
             return f"{result.name} {result.time} Score: {result.score}"
 
