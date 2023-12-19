@@ -64,5 +64,5 @@ class Video:
         self.capture.release()
         
     def save(self, filename: str, image):
-        gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
-        cv2.imwrite(filename, gray)
+        rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        cv2.imwrite(filename, rgb)

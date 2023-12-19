@@ -17,16 +17,23 @@ class Prediction:
             )
         return arr
     
+    def find_distances(self, distances):
+        val = max(distances)
+        print (val)
+        index = distances.index(val)
+        return index
+    
     def predict_image(self, image: Image) -> PredictResult:
         embedding = self.toVector(image)
-        data = collection.query(query_embeddings = [embedding], n_results = 1)
+        data = collection.query(query_embeddings = [embedding])
         if len(data['ids'][0]) > 0:
-            name, timestamp = data['ids'][0][0].split("|")
+            index = self.find_distances(data["distances"][0])
+            name, timestamp = data['ids'][0][index - 1].split("|")
             timestamp = datetime.timedelta(seconds=int(timestamp))
             # hours = timestamp.seconds // 3600
             # minutes = timestamp.seconds % 3600 // 60
             # seconds = (timestamp.seconds % 3600) % 60
-            score = data["distances"][0][0]
+            score = data["distances"][0][index - 1]
             result = PredictResult(name=name, time=timestamp, score=score)
             return result
         else:

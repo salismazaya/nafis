@@ -1,16 +1,10 @@
+import datetime
 from lib.chroma import collection
 from lib.schema import Result
-from rich.logging import RichHandler
+from lib.console import Console
 import sqlite3, glob, pathlib, pickle, zlib, logging
 
-logging.basicConfig(
-    level="NOTSET",
-    format="%(message)s",
-    datefmt="[%X]",
-    handlers=[RichHandler()]
-)
-logger = logging.getLogger("rich")
-
+logger = Console()
 logger.info("Connecting to database")
 conn = sqlite3.connect('database.db')
 cur = conn.cursor()
@@ -29,11 +23,18 @@ for database in databases:
             open(database, 'rb').read()
         )
     )
-    for embedding in result.embeddings:
-        collection.add(
-            ids = [f'{embedding.title}|{embedding.timestamp.seconds}'],
-            embeddings = [embedding.vector],
-        )
+    with logger.status("Collection add ") as status:
+        for index, embedding in enumerate(result.embeddings):
+            if (isinstance(embedding.timestamp, datetime.timedelta)):
+                timestamp = embedding.timestamp.seconds
+            else:
+                timestamp = embedding.timestamp
+            status.update(f"Collection add {index}/{len(result.embeddings)}")
+
+            collection.add(
+                ids = [f'{embedding.title}|{timestamp}'],
+                embeddings = [embedding.vector],
+            )
     
     logger.info("Saving imported database")
     cur.execute(f"INSERT INTO imported VALUES('{hash_}')")

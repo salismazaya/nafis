@@ -5,7 +5,6 @@ from torchvision import transforms
 from lib.console import Console
 from lib.predict import Prediction
 from PIL import Image
-console = Console()
 
 class CLI:
     def __init__(self, options = None) -> None:
