@@ -1,10 +1,12 @@
+import datetime
 from dataclasses import dataclass
 from typing import Tuple
+from datetime import timedelta
 
 @dataclass
 class Embedding:
     title: str
-    timestamp: int
+    timestamp: timedelta
     vector: Tuple[float]
 
 @dataclass
@@ -18,7 +20,5 @@ class Result:
 @dataclass
 class PredictResult:
     name: str
-    hours: int
-    minutes: int
-    seconds: int
+    time: datetime.timedelta
     score: int

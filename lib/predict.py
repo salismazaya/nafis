@@ -1,3 +1,4 @@
+import datetime
 from lib.chroma import collection
 from img2vec_pytorch import Img2Vec
 from PIL import Image
@@ -16,17 +17,24 @@ class Prediction:
             )
         return arr
     
+    def find_distances(self, distances):
+        val = max(distances)
+        print (val)
+        index = distances.index(val)
+        return index
+    
     def predict_image(self, image: Image) -> PredictResult:
         embedding = self.toVector(image)
-        data = collection.query(query_embeddings = [embedding], n_results = 1)
+        data = collection.query(query_embeddings = [embedding])
         if len(data['ids'][0]) > 0:
-            name, timestamp = data['ids'][0][0].split("|")
-            timestamp = int(timestamp)
-            hours = timestamp // 3600
-            minutes = timestamp % 3600 // 60
-            seconds = (timestamp % 3600) % 60
-            score = data["distances"][0][0]
-            result = PredictResult(name=name, hours=hours, minutes=minutes, seconds=seconds, score=score)
+            index = self.find_distances(data["distances"][0])
+            name, timestamp = data['ids'][0][index - 1].split("|")
+            timestamp = datetime.timedelta(seconds=int(timestamp))
+            # hours = timestamp.seconds // 3600
+            # minutes = timestamp.seconds % 3600 // 60
+            # seconds = (timestamp.seconds % 3600) % 60
+            score = data["distances"][0][index - 1]
+            result = PredictResult(name=name, time=timestamp, score=score)
             return result
         else:
             return None
